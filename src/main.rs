@@ -14,10 +14,11 @@ fn render() {
     for j in 0..HEIGHT {
         for i in 0..WIDTH {
             let index = i + j * WIDTH;
-            framebuffer[index] = Vector3::new((j / HEIGHT) as f64, (i / WIDTH) as f64, 0.0);
+            framebuffer[index] =
+                Vector3::new(j as f64 / HEIGHT as f64, i as f64 / WIDTH as f64, 0.0);
         }
     }
-    dbg!(framebuffer);
+
     let mut ofs = File::create("out.ppm").unwrap();
     write!(ofs, "P6\n{} {}\n255\n", WIDTH, HEIGHT).unwrap();
 }
