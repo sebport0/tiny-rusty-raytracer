@@ -17,7 +17,7 @@ fn render() {
             framebuffer[index] = Vector3::new((j / HEIGHT) as f64, (i / WIDTH) as f64, 0.0);
         }
     }
-
+    dbg!(framebuffer);
     let mut ofs = File::create("out.ppm").unwrap();
     write!(ofs, "P6\n{} {}\n255\n", WIDTH, HEIGHT).unwrap();
 }
