@@ -1,6 +1,6 @@
 use std::{fmt, ops};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Vector3 {
     pub x: f64,
     pub y: f64,
@@ -17,6 +17,20 @@ impl Vector3 {
             x: self.y * v.z - self.z * v.y,
             y: self.z * v.x - self.x * v.z,
             z: self.x * v.y - self.y * v.x,
+        }
+    }
+
+    pub fn norm(&self) -> f64 {
+        (self.x.powi(2) + self.y.powi(2) + self.z.powi(2)).sqrt()
+    }
+
+    pub fn normalize(&self) -> Vector3 {
+        let norm = self.norm();
+
+        Vector3 {
+            x: self.x / norm,
+            y: self.y / norm,
+            z: self.z / norm,
         }
     }
 }
@@ -123,12 +137,28 @@ mod tests {
     }
 
     #[test]
+    fn test_vector_norm() {
+        let v = Vector3::new(-2.0, 0.0, 0.0);
+        let expected = 2.0;
+
+        assert_eq!(v.norm(), expected);
+    }
+
+    #[test]
     fn test_vector_dot_product() {
         let v1 = Vector3::new(5.0, 10.0, -25.0);
         let v2 = Vector3::new(1.0, 0.0, 4.0);
         let expected = -95.0;
 
         assert_eq!(v1 * v2, expected);
+    }
+
+    #[test]
+    fn test_vector_normalization() {
+        let v = Vector3::new(1.0, 1.0, -1.0);
+        let expected = Vector3::new(0.5773502691896258, 0.5773502691896258, -0.5773502691896258);
+
+        assert_eq!(v.normalize(), expected);
     }
 
     #[test]
