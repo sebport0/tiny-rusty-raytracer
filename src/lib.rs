@@ -110,6 +110,30 @@ impl ops::Neg for Vector3 {
     }
 }
 
+impl ops::Index<usize> for Vector3 {
+    type Output = f64;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        match index {
+            0 => &self.x,
+            1 => &self.y,
+            2 => &self.z,
+            _ => panic!("Index out of range."),
+        }
+    }
+}
+
+impl ops::IndexMut<usize> for Vector3 {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        match index {
+            0 => &mut self.x,
+            1 => &mut self.y,
+            2 => &mut self.z,
+            _ => panic!("Index out of range."),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -203,5 +227,41 @@ mod tests {
         let expected = Vector3::new(-5.0, -10.0, 25.0);
 
         assert_eq!(-v1, expected);
+    }
+
+    #[test]
+    fn test_vector_index_access() {
+        let v = Vector3::new(0.0, 1.0, 2.0);
+        assert_eq!(v[0], 0.0);
+        assert_eq!(v[1], 1.0);
+        assert_eq!(v[2], 2.0);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_vector_panics_when_index_out_of_range() {
+        let v = Vector3::new(0.0, 1.0, 2.0);
+        v[3];
+    }
+
+    #[test]
+    fn test_vector_index_access_assign() {
+        let mut v = Vector3::new(0.0, 1.0, 2.0);
+
+        v[0] = -10.0;
+        assert_eq!(v[0], -10.0);
+
+        v[1] = 5.0;
+        assert_eq!(v[1], 5.0);
+
+        v[2] = 35.555;
+        assert_eq!(v[2], 35.555);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_vector_panics_when_try_to_assign_to_index_out_of_range() {
+        let mut v = Vector3::new(0.0, 1.0, 2.0);
+        v[5] = 12.0;
     }
 }
