@@ -9,7 +9,7 @@ fn main() {
 fn render() {
     const WIDTH: usize = 1024;
     const HEIGHT: usize = 768;
-    let mut framebuffer: Vec<Vector3> = vec![Vector3::new(0.0, 0.0, 0.25); WIDTH * HEIGHT];
+    let mut framebuffer: Vec<Vector3> = vec![Vector3::new(0.0, 0.0, 0.0); WIDTH * HEIGHT];
 
     for j in 0..HEIGHT {
         for i in 0..WIDTH {
