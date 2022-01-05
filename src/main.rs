@@ -9,7 +9,7 @@ fn main() {
 fn render() {
     const WIDTH: usize = 1024;
     const HEIGHT: usize = 768;
-    let mut framebuffer: Vec<Vector3> = vec![Vector3::new(0.0, 0.0, 0.0); WIDTH * HEIGHT];
+    let mut framebuffer: Vec<Vector3> = vec![Vector3::new(0.0, 0.0, 0.25); WIDTH * HEIGHT];
 
     for j in 0..HEIGHT {
         for i in 0..WIDTH {
@@ -20,5 +20,13 @@ fn render() {
     }
 
     let mut ofs = File::create("out.ppm").unwrap();
-    write!(ofs, "P6\n{} {}\n255\n", WIDTH, HEIGHT).unwrap();
+    write!(ofs, "P3\n{} {}\n255", WIDTH, HEIGHT).unwrap();
+
+    for i in 0..(HEIGHT * WIDTH) {
+        let red_value = (255.0 * framebuffer[i].x) as i32;
+        let green_value = (255.0 * framebuffer[i].y) as i32;
+        let blue_value = (255.0 * framebuffer[i].z) as i32;
+
+        write!(ofs, "\n{} {} {}", red_value, green_value, blue_value).unwrap();
+    }
 }
