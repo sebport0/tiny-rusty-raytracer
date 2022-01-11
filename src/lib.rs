@@ -142,6 +142,52 @@ impl ops::IndexMut<usize> for Vector3 {
     }
 }
 
+pub struct Sphere {
+    center: Vector3,
+    radius: f64,
+}
+
+impl Sphere {
+    pub fn new(center: Vector3, radius: f64) -> Sphere {
+        Sphere { center, radius }
+    }
+
+    pub fn ray_intersect(&self, orig: &Vector3, dir: &Vector3, t0: &f64) -> bool {
+        let l = self.center - *orig;
+        let tca = l * *dir;
+        let d2 = l * l - tca * tca;
+        let r2 = self.radius.powi(2);
+
+        if d2 > r2 {
+            return false;
+        };
+
+        let thc = (r2 - d2).sqrt();
+        let mut t0 = tca - thc;
+        let t1 = tca + thc;
+
+        if t0 < 0.0 {
+            t0 = t1;
+        }
+
+        if t0 < 0.0 {
+            return false;
+        }
+
+        true
+    }
+}
+
+pub fn cast_ray(orig: &Vector3, dir: &Vector3, sphere: &Sphere) -> Vector3 {
+    let sphere_dist = std::f64::MAX;
+
+    if !sphere.ray_intersect(orig, dir, &sphere_dist) {
+        return Vector3::new(0.2, 0.7, 0.8); // background color.
+    }
+
+    Vector3::new(0.4, 0.4, 0.3)
+}
+
 #[cfg(test)]
 mod tests_vector3 {
     use super::*;
@@ -273,3 +319,5 @@ mod tests_vector3 {
         v[5] = 12.0;
     }
 }
+
+// TODO: Sphere tests!
