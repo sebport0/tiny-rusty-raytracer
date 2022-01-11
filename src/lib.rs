@@ -1,6 +1,6 @@
 use std::{fmt, ops};
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Vector3 {
     pub x: f64,
     pub y: f64,
@@ -10,6 +10,14 @@ pub struct Vector3 {
 impl Vector3 {
     pub fn new(x: f64, y: f64, z: f64) -> Vector3 {
         Vector3 { x, y, z }
+    }
+
+    pub fn new_zero() -> Vector3 {
+        Vector3 {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        }
     }
 
     pub fn cross(&self, v: &Vector3) -> Vector3 {
@@ -135,7 +143,7 @@ impl ops::IndexMut<usize> for Vector3 {
 }
 
 #[cfg(test)]
-mod tests {
+mod tests_vector3 {
     use super::*;
 
     #[test]
