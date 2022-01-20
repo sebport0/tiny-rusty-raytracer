@@ -142,17 +142,33 @@ impl ops::IndexMut<usize> for Vector3 {
     }
 }
 
+#[derive(Copy, Clone)]
+pub struct Material {
+    pub color: Vector3,
+}
+
+impl Material {
+    pub fn new(color: Vector3) -> Material {
+        Material { color }
+    }
+}
+
 pub struct Sphere {
     center: Vector3,
     radius: f64,
+    material: Material,
 }
 
 impl Sphere {
-    pub fn new(center: Vector3, radius: f64) -> Sphere {
-        Sphere { center, radius }
+    pub fn new(center: Vector3, radius: f64, material: Material) -> Sphere {
+        Sphere {
+            center,
+            radius,
+            material,
+        }
     }
 
-    pub fn ray_intersect(&self, orig: &Vector3, dir: &Vector3, t0: &f64) -> bool {
+    pub fn ray_intersect(&self, orig: &Vector3, dir: &Vector3, t0: &mut f64) -> bool {
         let l = self.center - *orig;
         let tca = l * *dir;
         let d2 = l * l - tca * tca;
@@ -163,14 +179,14 @@ impl Sphere {
         };
 
         let thc = (r2 - d2).sqrt();
-        let mut t0 = tca - thc;
+        *t0 = tca - thc;
         let t1 = tca + thc;
 
-        if t0 < 0.0 {
-            t0 = t1;
+        if *t0 < 0.0 {
+            *t0 = t1;
         }
 
-        if t0 < 0.0 {
+        if *t0 < 0.0 {
             return false;
         }
 
@@ -178,14 +194,41 @@ impl Sphere {
     }
 }
 
-pub fn cast_ray(orig: &Vector3, dir: &Vector3, sphere: &Sphere) -> Vector3 {
-    let sphere_dist = std::f64::MAX;
+pub fn scene_intersect(
+    orig: &Vector3,
+    dir: &Vector3,
+    spheres: &Vec<Sphere>,
+    hit: &mut Vector3,
+    n: &mut Vector3,
+    material: &mut Material,
+) -> bool {
+    let mut spheres_dist = std::f64::MAX;
+    for sphere in spheres {
+        let mut dist_i: f64 = 0.0;
 
-    if !sphere.ray_intersect(orig, dir, &sphere_dist) {
-        return Vector3::new(0.2, 0.7, 0.8); // background color.
+        // Note: dist_i acts as t0 inside ray_intersect, where its value mutates.
+        if sphere.ray_intersect(orig, dir, &mut dist_i) && dist_i < spheres_dist {
+            spheres_dist = dist_i;
+            *hit = *orig + (*dir * dist_i);
+            *n = (*hit - sphere.center).normalize();
+            *material = sphere.material;
+        }
     }
 
-    Vector3::new(0.4, 0.4, 0.3)
+    spheres_dist < 1000.0
+}
+
+pub fn cast_ray(orig: &Vector3, dir: &Vector3, spheres: &Vec<Sphere>) -> Vector3 {
+    let mut point = Vector3::new_zero();
+    let mut n = Vector3::new_zero();
+    let mut material = Material::new(Vector3::new_zero());
+
+    if !scene_intersect(orig, dir, spheres, &mut point, &mut n, &mut material) {
+        let background_color = Vector3::new(0.2, 0.7, 0.8);
+        return background_color;
+    }
+
+    material.color
 }
 
 #[cfg(test)]
@@ -321,3 +364,16 @@ mod tests_vector3 {
 }
 
 // TODO: Sphere tests!
+
+#[cfg(test)]
+mod tests_material {
+    use super::*;
+
+    #[test]
+    fn test_material_creation() {
+        let color = Vector3::new(1.0, 1.0, 1.0);
+        let material = Material::new(color);
+
+        assert_eq!(material.color, color);
+    }
+}
